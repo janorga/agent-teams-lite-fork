@@ -43,18 +43,18 @@ print_error() {
 print_engram_note() {
     echo -e "\n${YELLOW}Recommended persistence backend:${NC} ${BOLD}Engram${NC}"
     echo -e "  ${CYAN}https://github.com/gentleman-programming/engram${NC}"
-    echo -e "  Default recommendation: set ${BOLD}artifact_store.mode: engram${NC} in your orchestrator config"
-    echo -e "  If Engram is unavailable, use ${BOLD}artifact_store.mode: auto${NC} (fallback: openspec or none)"
+    echo -e "  If Engram is available, it will be used automatically (recommended)"
+    echo -e "  If not, falls back to ${BOLD}none${NC} — enable ${BOLD}engram${NC} or ${BOLD}openspec${NC} for better results"
 }
 
 install_skills() {
     local target_dir="$1"
     local tool_name="$2"
-    
+
     echo -e "\n${BLUE}Installing skills for ${BOLD}$tool_name${NC}${BLUE}...${NC}"
-    
+
     mkdir -p "$target_dir"
-    
+
     local count=0
     for skill_dir in "$SKILLS_SRC"/sdd-*/; do
         local skill_name
@@ -64,8 +64,28 @@ install_skills() {
         print_skill "$skill_name"
         count=$((count + 1))
     done
-    
+
     echo -e "\n  ${GREEN}${BOLD}$count skills installed${NC} → $target_dir"
+}
+
+install_opencode_commands() {
+    local commands_src="$REPO_DIR/examples/opencode/commands"
+    local commands_target="$HOME/.config/opencode/commands"
+
+    echo -e "\n${BLUE}Installing OpenCode commands...${NC}"
+
+    mkdir -p "$commands_target"
+
+    local count=0
+    for cmd_file in "$commands_src"/sdd-*.md; do
+        local cmd_name
+        cmd_name=$(basename "$cmd_file")
+        cp "$cmd_file" "$commands_target/$cmd_name"
+        print_skill "${cmd_name%.md}"
+        count=$((count + 1))
+    done
+
+    echo -e "\n  ${GREEN}${BOLD}$count commands installed${NC} → $commands_target"
 }
 
 # ============================================================================
@@ -92,6 +112,7 @@ case $choice in
         ;;
     2)
         install_skills "$HOME/.opencode/skills" "OpenCode"
+        install_opencode_commands
         echo -e "\n${YELLOW}Next step:${NC} Add the orchestrator agent to your ${BOLD}~/.config/opencode/opencode.json${NC}"
         echo -e "  See: ${CYAN}examples/opencode/opencode.json${NC}"
         ;;
@@ -107,6 +128,7 @@ case $choice in
     5)
         install_skills "$HOME/.claude/skills" "Claude Code"
         install_skills "$HOME/.opencode/skills" "OpenCode"
+        install_opencode_commands
         install_skills "$HOME/.cursor/skills" "Cursor"
         echo -e "\n${YELLOW}Next steps:${NC}"
         echo -e "  1. Add orchestrator to ${BOLD}~/.claude/CLAUDE.md${NC}"
@@ -123,6 +145,6 @@ case $choice in
         ;;
 esac
 
-echo -e "\n${GREEN}${BOLD}Done!${NC} Start using SDD with: ${CYAN}/sdd:init${NC} in your project\n"
+echo -e "\n${GREEN}${BOLD}Done!${NC} Start using SDD with: ${CYAN}/sdd-init${NC} in your project\n"
 print_engram_note
 echo ""

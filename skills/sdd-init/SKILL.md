@@ -106,7 +106,7 @@ Return a structured summary adapted to the resolved mode:
 Project context persisted to Engram. No project files created.
 
 ### Next Steps
-Ready for /sdd:explore <topic> or /sdd:new <change-name>.
+Ready for /sdd-explore <topic> or /sdd-new <change-name>.
 ```
 
 #### If mode is `openspec`:
@@ -123,7 +123,7 @@ Ready for /sdd:explore <topic> or /sdd:new <change-name>.
 - openspec/changes/    ← Ready for change proposals
 
 ### Next Steps
-Ready for /sdd:explore <topic> or /sdd:new <change-name>.
+Ready for /sdd-explore <topic> or /sdd-new <change-name>.
 ```
 
 #### If mode is `none`:
@@ -141,7 +141,7 @@ Ready for /sdd:explore <topic> or /sdd:new <change-name>.
 Enable `engram` or `openspec` for artifact persistence across sessions. Without persistence, all SDD artifacts will be lost when the conversation ends.
 
 ### Next Steps
-Ready for /sdd:explore <topic> or /sdd:new <change-name>.
+Ready for /sdd-explore <topic> or /sdd-new <change-name>.
 ```
 
 ## Rules

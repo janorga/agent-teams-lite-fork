@@ -76,14 +76,14 @@ If there are multiple approaches, compare them:
 
 ### Step 4: Optionally Save Exploration
 
-If the orchestrator provided a change name (i.e., this exploration is part of `/sdd:new`), save your analysis to:
+If the orchestrator provided a change name (i.e., this exploration is part of `/sdd-new`), save your analysis to:
 
 ```
 openspec/changes/{change-name}/
 └── exploration.md          ← You create this
 ```
 
-If no change name was provided (standalone `/sdd:explore`), skip file creation — just return the analysis.
+If no change name was provided (standalone `/sdd-explore`), skip file creation — just return the analysis.
 
 ### Step 5: Return Structured Analysis
 

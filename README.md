@@ -293,13 +293,13 @@ See [Installation](#installation) for your specific tool.
 Open your AI assistant in any project and say:
 
 ```
-/sdd:init
+/sdd-init
 ```
 
 Then start building:
 
 ```
-/sdd:new add-csv-export
+/sdd-new add-csv-export
 ```
 
 Or let it detect automatically — describe a substantial feature and the orchestrator will suggest SDD.
@@ -310,19 +310,19 @@ Or let it detect automatically — describe a substantial feature and the orches
 
 | Command | What It Does |
 |---------|-------------|
-| `/sdd:init` | Initialize orchestration context. Creates `openspec/` only when persistence mode resolves to `openspec`. |
-| `/sdd:explore <topic>` | Investigate an idea. Reads codebase, compares approaches. No files created. |
-| `/sdd:new <name>` | Start a new change by delegating exploration + proposal to sub-agents. |
-| `/sdd:continue` | Run the next dependency-ready phase via sub-agent(s). |
-| `/sdd:ff <name>` | Fast-forward planning with sub-agents (proposal → specs → design → tasks). |
-| `/sdd:apply` | Implement tasks in batches. Checks off items in `tasks.md` as it goes. |
-| `/sdd:verify` | Validate implementation against specs. Reports CRITICAL / WARNING / SUGGESTION. |
-| `/sdd:archive` | Close a change and persist final state in the active artifact store. |
+| `/sdd-init` | Initialize SDD context. Detects stack and bootstraps the active persistence backend. |
+| `/sdd-explore <topic>` | Investigate an idea. Reads codebase, compares approaches. No files created. |
+| `/sdd-new <name>` | Start a new change by delegating exploration + proposal to sub-agents. |
+| `/sdd-continue` | Run the next dependency-ready phase via sub-agent(s). |
+| `/sdd-ff <name>` | Fast-forward planning with sub-agents (proposal → specs → design → tasks). |
+| `/sdd-apply` | Implement tasks in batches. Checks off items as it goes. |
+| `/sdd-verify` | Validate implementation against specs. Reports CRITICAL / WARNING / SUGGESTION. |
+| `/sdd-archive` | Close a change and persist final state in the active artifact store. |
 
 ### Example Flow
 
 ```
-You: /sdd:new add-dark-mode
+You: /sdd-new add-dark-mode
 
 AI:  Launching explorer sub-agent...
      ✓ Codebase analyzed. React + Tailwind detected.
@@ -341,9 +341,9 @@ AI:  ✓ specs/ui/spec.md — 3 requirements, 7 scenarios
      ✓ design.md — CSS variables approach, React Context, localStorage
      ✓ tasks.md — 3 phases, 8 tasks
      
-     Ready to implement. Run /sdd:apply to start.
+     Ready to implement. Run /sdd-apply to start.
 
-You: /sdd:apply
+You: /sdd-apply
 
 AI:  Implementing Phase 1 (Foundation)...
      ✓ 1.1 Created ThemeContext
@@ -399,27 +399,28 @@ Append the contents of [`examples/claude-code/CLAUDE.md`](examples/claude-code/C
 This keeps your existing assistant identity and adds SDD as an orchestration overlay.
 
 The orchestrator instructions teach Claude Code to:
-- Detect SDD triggers (`/sdd:new`, feature descriptions, etc.)
+- Detect SDD triggers (`/sdd-new`, feature descriptions, etc.)
 - Launch sub-agents via the Task tool
 - Pass skill file paths so sub-agents read their instructions
 - Track state between phases
 
 **3. Verify:**
 
-Open Claude Code and type `/sdd:init` — it should recognize the command.
+Open Claude Code and type `/sdd-init` — it should recognize the command.
 
 ---
 
 ### OpenCode
 
-**1. Copy skills:**
+**1. Copy skills and commands:**
 
 ```bash
-# Using the install script
+# Using the install script (installs both skills + commands)
 ./scripts/install.sh  # Choose option 2: OpenCode
 
 # Or manually
 cp -r skills/sdd-* ~/.opencode/skills/
+cp examples/opencode/commands/sdd-*.md ~/.config/opencode/commands/
 ```
 
 **2. Add orchestrator agent to `~/.config/opencode/opencode.json`:**
@@ -437,12 +438,13 @@ Recommended OpenCode setup:
 
 **3. Verify:**
 
-Open OpenCode and type `/sdd:init` — it should recognize the command.
+Open OpenCode and type `/sdd-init` — it should recognize the command.
 
 How to use in OpenCode:
 - Start OpenCode in your project: `opencode .`
 - Use the agent picker (Tab) and choose `sdd-orchestrator`
-- Run SDD commands (`/sdd:init`, `/sdd:new <name>`, `/sdd:continue`, etc.)
+- Run SDD commands: `/sdd-init`, `/sdd-new <name>`, `/sdd-apply`, etc.
+- Commands are installed at `~/.config/opencode/commands/` and auto-discovered by OpenCode
 - Switch back to your normal agent (Tab) for day-to-day coding
 
 ---
@@ -520,7 +522,9 @@ agent-teams-lite/
 │   ├── sdd-verify/SKILL.md
 │   └── sdd-archive/SKILL.md
 ├── examples/                          ← Config examples per tool
-│   ├── opencode/opencode.json
+│   ├── opencode/
+│   │   ├── opencode.json              ← Orchestrator agent config
+│   │   └── commands/sdd-*.md          ← Slash commands for OpenCode
 │   ├── claude-code/CLAUDE.md
 │   └── cursor/.cursorrules
 └── scripts/
