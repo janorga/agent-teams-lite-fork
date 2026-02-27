@@ -375,10 +375,15 @@ Each sub-agent is a SKILL.md file — pure Markdown instructions that any AI ass
 
 ## Installation
 
-For a full Agent Teams setup, users should configure these two files:
+Dedicated setup guides for all supported tools:
 
-- Claude Code: `~/.claude/CLAUDE.md` (append `examples/claude-code/CLAUDE.md`)
-- OpenCode: `~/.config/opencode/opencode.json` (merge `agent.sdd-orchestrator` from `examples/opencode/opencode.json`)
+- [Claude Code](#claude-code) — Full sub-agent support via Task tool
+- [OpenCode](#opencode) — Full sub-agent support via Task tool
+- [Gemini CLI](#gemini-cli) — Inline skill execution
+- [Codex](#codex) — Inline skill execution
+- [VS Code (Copilot)](#vs-code-copilot) — Agent mode with context files
+- [Antigravity](#antigravity) — VS Code-compatible, same configuration
+- [Cursor](#cursor) — Inline skill execution
 
 ### Claude Code
 
@@ -449,6 +454,113 @@ How to use in OpenCode:
 
 ---
 
+### Gemini CLI
+
+**1. Copy skills:**
+
+```bash
+# Using the install script
+./scripts/install.sh  # Choose Gemini CLI option
+
+# Or manually
+cp -r skills/sdd-* ~/.gemini/skills/
+```
+
+**2. Add orchestrator to `~/.gemini/GEMINI.md`:**
+
+Append the contents of [`examples/gemini-cli/GEMINI.md`](examples/gemini-cli/GEMINI.md) to your Gemini system prompt file (create it if it doesn't exist).
+
+Make sure `GEMINI_SYSTEM_MD=1` is set in `~/.gemini/.env` so Gemini loads the system prompt.
+
+**3. Verify:**
+
+Open Gemini CLI and type `/sdd-init` — it should recognize the command.
+
+> **Note:** Gemini CLI doesn't have a native Task tool for sub-agent delegation. The skills work as inline instructions — the orchestrator reads them directly rather than spawning fresh-context sub-agents. For the best sub-agent experience, use Claude Code or OpenCode.
+
+---
+
+### Codex
+
+**1. Copy skills:**
+
+```bash
+# Using the install script
+./scripts/install.sh  # Choose Codex option
+
+# Or manually
+cp -r skills/sdd-* ~/.codex/skills/
+```
+
+**2. Add orchestrator instructions:**
+
+Add the orchestrator instructions to `~/.codex/agents.md` (or your `model_instructions_file` if configured).
+
+**3. Verify:**
+
+Open Codex and type `/sdd-init`.
+
+> **Note:** Like Gemini CLI, Codex runs skills inline rather than as true sub-agents. The planning phases (proposal, spec, design, tasks) still work well; implementation batching is handled by the orchestrator instructions.
+
+---
+
+### VS Code (Copilot)
+
+VS Code supports MCP and custom instructions natively. The skills work with Copilot's agent mode and any MCP-compatible extension.
+
+**1. Copy skills to workspace:**
+
+```bash
+# Per-project (recommended)
+cp -r skills/sdd-* ./your-project/.vscode/skills/
+
+# Or using the install script
+./scripts/install.sh  # Choose VS Code option
+```
+
+**2. Add orchestrator instructions:**
+
+Create or edit `.github/copilot-instructions.md` in your project and append the orchestrator instructions from [`examples/vscode/copilot-instructions.md`](examples/vscode/copilot-instructions.md).
+
+Alternatively, use VS Code's custom instructions setting:
+1. Open Settings (`Cmd+,` / `Ctrl+,`)
+2. Search for `github.copilot.chat.codeGeneration.instructions`
+3. Add the SDD orchestrator instructions
+
+**3. Verify:**
+
+Open VS Code, open the Chat panel (Ctrl+Cmd+I / Ctrl+Alt+I), and type `/sdd-init`.
+
+> **Note:** VS Code Copilot supports agent mode with tool use. Skills work as context files. For true sub-agent delegation with fresh context windows, use Claude Code or OpenCode.
+
+---
+
+### Antigravity
+
+[Antigravity](https://antigravity.google) is Google's AI-first IDE built on VS Code. It follows the same configuration patterns as VS Code.
+
+**1. Copy skills:**
+
+```bash
+# Per-project
+cp -r skills/sdd-* ./your-project/.vscode/skills/
+
+# Or using the install script
+./scripts/install.sh  # Choose Antigravity option
+```
+
+**2. Add orchestrator instructions:**
+
+Follow the same steps as [VS Code (Copilot)](#vs-code-copilot) — Antigravity uses the same configuration paths and instruction files.
+
+**3. Verify:**
+
+Open Antigravity in your project and type `/sdd-init` in the chat panel.
+
+> Antigravity is VS Code-compatible — all VS Code MCP and instruction configurations work identically.
+
+---
+
 ### Cursor
 
 **1. Copy skills to project or global:**
@@ -469,7 +581,7 @@ Append the contents of [`examples/cursor/.cursorrules`](examples/cursor/.cursorr
 
 ---
 
-### Other Tools (Windsurf, Copilot, Gemini CLI, etc.)
+### Other Tools
 
 The skills are pure Markdown. Any AI assistant that can read files can use them.
 
@@ -522,10 +634,13 @@ agent-teams-lite/
 │   ├── sdd-verify/SKILL.md
 │   └── sdd-archive/SKILL.md
 ├── examples/                          ← Config examples per tool
+│   ├── claude-code/CLAUDE.md
 │   ├── opencode/
 │   │   ├── opencode.json              ← Orchestrator agent config
 │   │   └── commands/sdd-*.md          ← Slash commands for OpenCode
-│   ├── claude-code/CLAUDE.md
+│   ├── gemini-cli/GEMINI.md
+│   ├── codex/agents.md
+│   ├── vscode/copilot-instructions.md
 │   └── cursor/.cursorrules
 └── scripts/
     └── install.sh                     ← Interactive installer
