@@ -126,7 +126,7 @@ graph TB
         L2_Apply["Implementer"]
         L2_Verify["Verifier"]
         L2_Archive["Archiver"]
-        
+
         L2_Orch -->|"DAG phase"| L2_Explore
         L2_Orch -->|"DAG phase"| L2_Propose
         L2_Orch -->|"parallel"| L2_Spec
@@ -135,11 +135,15 @@ graph TB
         L2_Orch -->|"batched"| L2_Apply
         L2_Orch -->|"DAG phase"| L2_Verify
         L2_Orch -->|"DAG phase"| L2_Archive
-        
+
         L2_Store[("Pluggable Store<br/>engram | openspec | hybrid | none")]
+        L2_Registry[("Skill Registry<br/>auto-discover coding skills<br/>+ project conventions")]
         L2_Spec -.->|"persist"| L2_Store
         L2_Design -.->|"persist"| L2_Store
         L2_Apply -.->|"persist"| L2_Store
+        L2_Explore -.->|"Step 1: load"| L2_Registry
+        L2_Apply -.->|"Step 1: load"| L2_Registry
+        L2_Verify -.->|"Step 1: load"| L2_Registry
     end
 
     subgraph "Level 3 — Full Agent Teams"
@@ -148,7 +152,7 @@ graph TB
         L3_A2["Agent B"]
         L3_A3["Agent C"]
         L3_Queue[("Shared Task Queue<br/>claim / heartbeat")]
-        
+
         L3_Orch -->|"manage"| L3_Queue
         L3_A1 <-->|"claim & report"| L3_Queue
         L3_A2 <-->|"claim & report"| L3_Queue
@@ -159,6 +163,7 @@ graph TB
 
     style L2_Orch fill:#4CAF50,color:#fff,stroke:#333
     style L2_Store fill:#2196F3,color:#fff,stroke:#333
+    style L2_Registry fill:#9C27B0,color:#fff,stroke:#333
     style L3_Queue fill:#FF9800,color:#fff,stroke:#333
 ```
 
@@ -169,6 +174,7 @@ graph TB
 | Parallel phases (spec ∥ design) | — | ✅ | ✅ |
 | Structured result envelope | — | ✅ | ✅ |
 | Pluggable artifact store | — | ✅ | ✅ |
+| **Skill auto-discovery** | — | ✅ | ✅ |
 | Shared task queue with claim/heartbeat | — | — | ✅ |
 | Teammate ↔ teammate communication | — | — | ✅ |
 | Dynamic work stealing | — | — | ✅ |
@@ -200,7 +206,20 @@ graph TB
 │        ││        ││        ││        ││        ││        │
 │ Fresh  ││ Fresh  ││ Fresh  ││ Fresh  ││ Fresh  ││ Fresh  │
 │context ││context ││context ││context ││context ││context │
-└────────┘└────────┘└────────┘└────────┘└────────┘└────────┘
+└───┬────┘└───┬────┘└───┬────┘└───┬────┘└───┬────┘└───┬────┘
+    │         │         │         │         │         │
+    └─────────┴─────────┴────┬────┴─────────┴─────────┘
+                             │
+                    Step 1: load skills
+                             │
+                 ┌───────────▼───────────┐
+                 │    SKILL REGISTRY     │
+                 │                       │
+                 │ • Your coding skills  │
+                 │   (React, TDD, etc.)  │
+                 │ • Project conventions │
+                 │   (agents.md, etc.)   │
+                 └───────────────────────┘
 ```
 
 ### The Dependency Graph
