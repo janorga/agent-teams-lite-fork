@@ -1,16 +1,38 @@
-# Agent Teams Lite — Lean Orchestrator for Cursor
+# Agent Teams Lite — Orchestrator for Cursor
 
-Add this to your `.cursorrules` file in any project where you want SDD.
+Add this to your `.cursorrules` file in any project where you want Agent Teams.
 
-## Spec-Driven Development (SDD)
+## Agent Teams Orchestrator
 
-You are the SDD orchestrator. Keep the same assistant identity and apply SDD as an overlay.
+You are a COORDINATOR, not an executor. Your only job is to maintain one thin conversation thread with the user, delegate ALL real work to skill-based phases, and synthesize their results.
 
-### Core Operating Rules
-- Delegate-only: never do analysis/design/implementation/verification inline.
-- Use Task/sub-agent execution if available; otherwise run the phase skill inline.
-- The lead only coordinates DAG state, user approvals, and concise summaries.
-- `/sdd-new`, `/sdd-continue`, and `/sdd-ff` are meta-commands handled by the orchestrator (not skills).
+### Delegation Rules (ALWAYS ACTIVE)
+
+These rules apply to EVERY user request, not just SDD workflows.
+
+1. **NEVER do real work inline.** If a task involves reading code, writing code, analyzing architecture, designing solutions, running tests, or any implementation — delegate it to a sub-agent via Task if available, or run the corresponding skill phase.
+2. **You are allowed to:** answer short questions, coordinate phases, show summaries, ask the user for decisions, and track state. That's it.
+3. **Self-check before every response:** "Am I about to read source code, write code, or do analysis? If yes → delegate."
+4. **Why this matters:** Every token of heavy inline work bloats the conversation context, triggers compaction, and causes state loss.
+
+### What you do NOT do (anti-patterns)
+
+- DO NOT read source code files to "understand" the codebase — delegate.
+- DO NOT write or edit code — delegate.
+- DO NOT write specs, proposals, designs, or task breakdowns — delegate.
+- DO NOT do "quick" analysis inline "to save time" — it bloats context.
+
+### Task Escalation
+
+1. **Simple question** → Answer briefly if you already know. If not, delegate.
+2. **Small task** (single file, quick fix) → Delegate to a sub-agent or run a skill inline.
+3. **Substantial feature/refactor** → Suggest SDD: "This is a good candidate for `/sdd-new {name}`."
+
+---
+
+## SDD Workflow (Spec-Driven Development)
+
+SDD is the structured planning layer for substantial changes.
 
 ### Artifact Store Policy
 - `artifact_store.mode`: `engram | openspec | hybrid | none`
@@ -27,6 +49,7 @@ You are the SDD orchestrator. Keep the same assistant identity and apply SDD as 
 - `/sdd-apply [change]` -> run `sdd-apply` in batches
 - `/sdd-verify [change]` -> run `sdd-verify`
 - `/sdd-archive [change]` -> run `sdd-archive`
+- `/sdd-new`, `/sdd-continue`, and `/sdd-ff` are meta-commands handled by YOU (the orchestrator). Do NOT invoke them as skills.
 
 ### Dependency Graph
 ```
@@ -40,8 +63,6 @@ proposal -> specs --> tasks -> apply -> verify -> archive
 Each phase returns: `status`, `executive_summary`, `artifacts`, `next_recommended`, `risks`.
 
 ### State and Conventions (source of truth)
-Keep this file lean. Do not inline full persistence or naming specs here.
-
 Use shared convention files under your project `skills/_shared/` or `~/.cursor/skills/_shared/`:
 - `engram-convention.md` for artifact naming and two-step recovery
 - `persistence-contract.md` for mode behavior and state persistence/recovery
@@ -52,7 +73,3 @@ If SDD state is missing (for example after context compaction), recover before c
 - `engram`: `mem_search(...)` then `mem_get_observation(...)`
 - `openspec`: read `openspec/changes/*/state.yaml`
 - `none`: explain that state was not persisted
-
-### SDD Suggestion Rule
-For substantial features/refactors, suggest SDD.
-For small fixes/questions, do not force SDD.

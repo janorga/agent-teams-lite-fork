@@ -49,7 +49,7 @@ ORCHESTRATOR (delegate-only, minimal context):
   → launches ARCHIVER sub-agent     → returns: change closed
 ```
 
-**The key insight**: the orchestrator NEVER does phase work directly. It only coordinates sub-agents, tracks state, and synthesizes summaries. This keeps the main thread small and stable.
+**The key insight**: the orchestrator NEVER does real work directly — not just SDD phases, but ANY task. It delegates everything to sub-agents, tracks state, and synthesizes summaries. This keeps the main thread small and stable. For substantial features, it uses the SDD workflow (structured DAG of phases). For smaller tasks, it still delegates to a general sub-agent.
 
 ### Persistence Is Pluggable
 
@@ -175,14 +175,15 @@ graph TB
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ORCHESTRATOR (your main agent — gentleman, default, etc) │
+│  ORCHESTRATOR (coordinator — never does real work)         │
 │                                                           │
 │  Responsibilities:                                        │
-│  • Detect when SDD is needed                              │
+│  • Delegate ALL tasks to sub-agents (not just SDD)        │
 │  • Launch sub-agents via Task tool                        │
 │  • Show summaries to user                                 │
 │  • Ask for approval between phases                        │
 │  • Track state: which artifacts exist, what's next        │
+│  • Suggest SDD for substantial features/refactors         │
 │                                                           │
 │  Context usage: MINIMAL (only state + summaries)          │
 └──────────────┬───────────────────────────────────────────┘
